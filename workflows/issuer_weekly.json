@@ -1,0 +1,16 @@
+{
+  "params_file": "../nodes/issuer_weekly_params.json",
+  "required_params": [
+    "week_dt",
+    "prev_month_week_start",
+    "input_file",
+    "input_year"
+  ],
+  "nodes": [
+    "../nodes/01_issuer_schema.sql",
+    "../nodes/01_import_data.py",
+    "../nodes/02_weekly_summary.sql",
+    "../nodes/03_weekly_alerts.py",
+    "../nodes/04_output.sql"
+  ]
+}
