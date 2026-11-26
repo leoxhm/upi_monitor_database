@@ -1,5 +1,5 @@
 {
-  "params_file": "../nodes/issuer_weekly_params.json",
+  "params_file": "../nodes/issuer/issuer_weekly_params.json",
   "required_params": [
     "week_dt",
     "prev_month_week_start",
@@ -7,10 +7,10 @@
     "input_year"
   ],
   "nodes": [
-    "../nodes/01_issuer_schema.sql",
-    "../nodes/01_import_data.py",
-    "../nodes/02_weekly_summary.sql",
-    "../nodes/03_weekly_alerts.py",
-    "../nodes/04_output.sql"
+    "../nodes/issuer/01_issuer_schema.sql",
+    "../nodes/issuer/02_import_data.py",
+    "../nodes/issuer/03_weekly_summary.sql",
+    "../nodes/issuer/04_weekly_alerts.py",
+    "../nodes/issuer/05_output.sql"
   ]
 }

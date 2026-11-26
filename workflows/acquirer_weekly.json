@@ -1,0 +1,16 @@
+{
+  "params_file": "../nodes/acquirer/acquirer_weekly_params.json",
+  "required_params": [
+    "week_dt",
+    "prev_month_week_start",
+    "input_file",
+    "input_year"
+  ],
+  "nodes": [
+    "../nodes/acquirer/01_acquirer_schema.sql",
+    "../nodes/acquirer/02_import_data.py",
+    "../nodes/acquirer/03_weekly_summary.sql",
+    "../nodes/acquirer/04_weekly_alerts.py",
+    "../nodes/acquirer/05_output.sql"
+  ]
+}

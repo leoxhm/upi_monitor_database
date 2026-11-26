@@ -12,6 +12,10 @@ def run(conn, params):
         params=params,
     )
 
+    conn.execute(
+        "DELETE FROM issuer_weekly_percentiles WHERE week_dt = :week_dt",
+        params,
+    )
     if df.empty:
         return
 
@@ -40,6 +44,23 @@ def run(conn, params):
         .quantile([0.50, 0.75, 0.90, 0.99])
         .rename_axis(index=["market_group", "percentile"])
         .reset_index()
+    )
+
+    # 保存实际用于分档的阈值，缺失指标写为 SQLite NULL。
+    thresholds = result.astype(object).where(result.notna(), None)
+    conn.executemany(
+        """
+        INSERT INTO issuer_weekly_percentiles (
+            week_dt, market_group, percentile,
+            txn_count_threshold, txn_amount_threshold
+        ) VALUES (?, ?, ?, ?, ?)
+        """,
+        (
+            (params["week_dt"], group, round(fraction * 100), count, amount)
+            for group, fraction, count, amount in thresholds.itertuples(
+                index=False, name=None
+            )
+        ),
     )
 
 
@@ -253,13 +274,13 @@ def run(conn, params):
     placeholders = ", ".join("?" for _ in alert_columns)
     updates_sql = ", ".join(
         f"{column} = excluded.{column}"
-        for column in alert_columns[2:]
+        for column in alert_columns[5:]
     )
 
     sql = f"""
     INSERT INTO issuer_weekly_alert_data ({columns_sql})
     VALUES ({placeholders})
-    ON CONFLICT (week_dt, issuer_code)
+    ON CONFLICT (week_dt, issuer_branch, issuer_market, issuer_name, issuer_code)
     DO UPDATE SET {updates_sql}
     """
 

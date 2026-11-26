@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS issuer_weekly_monitor_data (
     txn_amount_wow REAL,                       -- 金额周环比增长率
     txn_amount_vs_prev_month REAL,             -- 较上月同周金额增长率
 
-    PRIMARY KEY (week_dt, issuer_code)
+    PRIMARY KEY (week_dt, issuer_branch,issuer_market,issuer_name,issuer_code)
 );
 
 
@@ -80,8 +80,18 @@ CREATE TABLE IF NOT EXISTS issuer_weekly_alert_data (
     txn_drop_alert TEXT,                       -- 交易突降
     overall_alert TEXT,                        -- 异常总览
 
-    PRIMARY KEY (week_dt, issuer_code),
+    PRIMARY KEY (week_dt, issuer_branch, issuer_market, issuer_name, issuer_code),
 
-    FOREIGN KEY (week_dt, issuer_code)
-        REFERENCES issuer_weekly_monitor_data (week_dt, issuer_code)
+    FOREIGN KEY (week_dt, issuer_branch, issuer_market, issuer_name, issuer_code)
+        REFERENCES issuer_weekly_monitor_data (week_dt, issuer_branch, issuer_market, issuer_name, issuer_code)
+);
+
+-- 每个统计周和市场组使用的交易笔数、金额分档阈值。
+CREATE TABLE IF NOT EXISTS issuer_weekly_percentiles (
+    week_dt TEXT NOT NULL,
+    market_group TEXT NOT NULL,
+    percentile INTEGER NOT NULL CHECK (percentile IN (50, 75, 90, 99)),
+    txn_count_threshold REAL,
+    txn_amount_threshold REAL,
+    PRIMARY KEY (week_dt, market_group, percentile)
 );
